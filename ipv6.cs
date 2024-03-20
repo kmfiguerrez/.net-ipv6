@@ -4,7 +4,7 @@ public struct IPv6ReturnData
 {
   public bool success;
   public string? data;
-  public string? message;
+  public string? error;
 
 }
 
@@ -87,11 +87,10 @@ public class IPv6
     }
 
     // If double colon is not used then a valid ipv6 address has an eight groups of segments and should only have a max of 7 colons.
-
     regexPattern = @"::";
     if (!Regex.IsMatch(ipv6Address, regexPattern) && !Regex.IsMatch(ipv6Address, completeIPv6FormatPattern))
     {
-      Console.WriteLine("From IsValidIPv6: Invalid IPv6 format - Invalid IPv6 format provided.");
+      Console.WriteLine("From IsValidIPv6: Invalid IPv6 format - Invalid IPv6 address provided.");
       return false;       
     }
     
@@ -146,7 +145,7 @@ public class IPv6
     catch (ArgumentException ex)
     {
       expandedIPv6.success = false;
-      expandedIPv6.message = ex.Message;
+      expandedIPv6.error = ex.Message;
       expandedIPv6.data = null;
       return expandedIPv6;
     }
@@ -156,7 +155,7 @@ public class IPv6
     {
       expandedIPv6.success = true;
       expandedIPv6.data = "0000:0000:0000:0000:0000:0000:0000:0000";
-      expandedIPv6.message = null;
+      expandedIPv6.error = null;
       return expandedIPv6;
     }
 
@@ -197,7 +196,7 @@ public class IPv6
 
     // Update message.
     expandedIPv6.success = true;
-    expandedIPv6.message = null;
+    expandedIPv6.error = null;
     expandedIPv6.data = String.Join(':', segments);    
     // Finally
     return expandedIPv6;
@@ -295,13 +294,13 @@ public class IPv6
     {
       abbreviatedIPv6.success = false;
       abbreviatedIPv6.data = null;
-      abbreviatedIPv6.message = ex.Message;
+      abbreviatedIPv6.error = ex.Message;
       return abbreviatedIPv6;
     }
 
     // Update the return data.
     abbreviatedIPv6.success = true;
-    abbreviatedIPv6.message = null;
+    abbreviatedIPv6.error = null;
     // Finally. 
     return abbreviatedIPv6;
   }
