@@ -25,7 +25,7 @@ public class IPv6
     // [0-9a-f]{1,4} means a segment of at least one and max at four of hex digits.
     // [0-9a-f]{1,4}: means a segment that ends with a semi-colon.
     // ([0-9a-f]{1,4}:){7} means a segment ends with a semi-colon, seven times.
-    string completeIPv6FormatPattern = @"^([a-f0-9]:{1,4}){7}[a-f0-9]{1,4}$";
+    string completeIPv6FormatPattern = @"([a-f0-9]{1,4}:){7}[a-f0-9]{1,4}";
     string regexPattern;
     // This pattern used to check valic ipv6 characters.
     const string ipv6CharPattern = @"[^a-f0-9:]";
@@ -87,17 +87,18 @@ public class IPv6
     }
 
     // If double colon is not used then a valid ipv6 address has an eight groups of segments and should only have a max of 7 colons.
-    // Otherwise used, then double-colon can only be used if there's two or more consecutive of segments of all zeros.
-    // So segments cannot be more than six.
+
     regexPattern = @"::";
     if (!Regex.IsMatch(ipv6Address, regexPattern) && !Regex.IsMatch(ipv6Address, completeIPv6FormatPattern))
     {
-      Console.WriteLine("From IsValidIPv6: Invalid IPv6 format - A segment can only have a max of four hex digits.");
+      Console.WriteLine("From IsValidIPv6: Invalid IPv6 format - Invalid IPv6 format provided.");
       return false;       
     }
-    else
+    
+    // If then double-colon can only be used if there's two or more consecutive of segments of all zeros.
+    // So segments cannot be more than six.
+    if (Regex.IsMatch(ipv6Address, regexPattern))
     {
-      // Otherwise :: is used.
       segments = Regex.Matches(ipv6Address, @"[0-9a-f]{1,4}");
       if (segments.Count > 6)
       {
@@ -107,7 +108,7 @@ public class IPv6
     }
 
     // Finally return true if all checkings passed.
-    Console.WriteLine("Valid IPv6 Address");
+    // Console.WriteLine("Valid IPv6 Address");
     return true;
   }
 
@@ -140,7 +141,7 @@ public class IPv6
     try
     {
       // Check first if the address is valid.
-      if (!IsValidIPv6(ipv6Address)) throw new ArgumentException("From Expand: Coudn't expand the address.");
+      if (!IsValidIPv6(ipv6Address)) throw new ArgumentException("From Expand: Invalid IPv6 provided.");
     }
     catch (ArgumentException ex)
     {
@@ -194,7 +195,6 @@ public class IPv6
       }
     }
 
-    
     // Update message.
     expandedIPv6.success = true;
     expandedIPv6.message = null;
@@ -202,6 +202,7 @@ public class IPv6
     // Finally
     return expandedIPv6;
   }
+
 
   /// <summary>
   /// This method abbreviates an IPv6 address by removing leading zeroes
@@ -221,7 +222,7 @@ public class IPv6
     const string segmentAllZeroPattern = @"^0000$";
     const string leadingZeroPattern = @"^0+";
     // This pattern assumes the IPv6 Address has no leading zeros.
-    const string seriesOfZeroesPattern = @"(0(:0)){1,}";
+    const string seriesOfZeroesPattern = @"0(:0){1,}";
 
     string[] segments;
 
@@ -233,20 +234,22 @@ public class IPv6
     try
     {
       // Validate the address first.
-      if (!IsValidIPv6(ipv6Address)) throw new ArgumentException("From Abbreviate: Coudn't abbreviate the address.");
+      if (!IsValidIPv6(ipv6Address)) throw new ArgumentException("From Abbreviate: Provided invalid IPv6 address.");
 
       IPv6ReturnData expandedIPv6 = Expand(ipv6Address);
-      if (!expandedIPv6.success) throw new ArgumentException("From Abbreviate: Coudn't abbreviate the address.");
+      if (!expandedIPv6.success) throw new ArgumentException("From Abbreviate: Expanding Part Failed.");
 
       // Set the segments.
-      if (expandedIPv6.data != null)
-      {
-        segments = expandedIPv6.data.Split(':');
-      }
-      else
-      {
-        throw new ArgumentException("From Abbreviate: Coudn't abbreviate the address.");
-      }
+      // if (expandedIPv6.data != null)
+      // {
+      //   segments = expandedIPv6.data.Split(':');
+      // }
+      // else
+      // {
+      //   throw new ArgumentException("From Abbreviate: Coudn't abbreviate the address.");
+      // }
+
+      segments = expandedIPv6.data.Split(':');
 
       // Remove leading zeroes.
       for (int i = 0; i < segments.Length; i++)
@@ -261,13 +264,46 @@ public class IPv6
         segments[i] = Regex.Replace(segments[i], leadingZeroPattern, "");
       }
 
+      // Get the instances of series of segments of zeroes.
+      string ipv6Str = String.Join(':', segments);
+      string[] instances = Regex.Matches(ipv6Str, seriesOfZeroesPattern).Select(match => match.Value).ToArray();
+      // Choose the longest sequence.
+      string longestSequence;
+      if (instances.Length != 0)
+      {
+        // Set the temporary longest sequence.
+        longestSequence = instances[0];
+        // Update the longest sequence.
+        foreach (string instance in instances)
+        {
+          if (instance.Length > longestSequence.Length) longestSequence = instance;
+        }
+      }
+      else
+      {
+        throw new ArgumentException("From Abbreviate: Coudn't get instances of series of zeroes.");
+      }
 
+      // Turn the longest sequence into double-colon (::)
+      // Update the data.
+      abbreviatedIPv6.data = Regex.Replace(ipv6Str, longestSequence, "::");
+      // The replace method above causes more than two of contiguous colons.
+      // So perform a replace again.
+      abbreviatedIPv6.data = Regex.Replace(abbreviatedIPv6.data, @":{3,}", "::");
     }
-    catch (System.Exception)
+    catch (ArgumentException ex)
     {
-      
-      throw;
+      abbreviatedIPv6.success = false;
+      abbreviatedIPv6.data = null;
+      abbreviatedIPv6.message = ex.Message;
+      return abbreviatedIPv6;
     }
+
+    // Update the return data.
+    abbreviatedIPv6.success = true;
+    abbreviatedIPv6.message = null;
+    // Finally. 
+    return abbreviatedIPv6;
   }
 
 
