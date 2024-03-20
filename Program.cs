@@ -1,8 +1,9 @@
-﻿const string ipv6Add = "aaaa:b:c:d:e::f:0:1:5";
+﻿const string ipv6Add = ":::";
 
-IPv6.IsValidIPv6(ipv6Add);
+var res = IPv6.Expand(ipv6Add);
+Console.WriteLine(res.message);
 
-// string sub = ipv6Add.Substring(ipv6Add.Length -2, 2);
-string sub = ipv6Add[(ipv6Add.Length - 2)..];
 
-// Console.WriteLine(sub);
+
+
+// Console.WriteLine(str);

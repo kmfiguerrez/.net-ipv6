@@ -10,7 +10,7 @@ public class Utils
     
     display += '[';
 
-    foreach (var item in collection)
+    foreach (T item in collection)
     {
       if (item != null)
       {
