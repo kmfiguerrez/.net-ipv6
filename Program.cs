@@ -1,4 +1,4 @@
-﻿const string ipv6Add = "a:b:c:d:e::f:0:1::5";
+﻿const string ipv6Add = "aaaa:b:c:d:e::f:0:1:5";
 
 IPv6.IsValidIPv6(ipv6Add);
 
