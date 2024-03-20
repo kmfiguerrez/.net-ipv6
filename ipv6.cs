@@ -112,6 +112,163 @@ public class IPv6
   }
 
 
+  /// <summary>
+  /// This method expands an abbreviated IPv6 address
+  /// by adding leading zeroes to segment and turning
+  /// :: into a series of segment of zeroes.
+  /// </summary>
+  /// <param name="ipv6Address"></param>
+  /// <returns>
+  /// An object that has three properties: success and two nullable 
+  /// string type: message and data.
+  /// </returns>
+  public static IPv6ReturnData Expand(string ipv6Address)
+  {
+    // Sanitize user input first.
+    ipv6Address = ipv6Address.Trim().ToLower();
+
+    // Regex pattern.
+    string doubleColonPattern = @"^::$";
+    string segmentPattern = @"[0-9a-f]{1,4}";
+
+    List<string> segments = [];
+
+    // Return data.
+    IPv6ReturnData expandedIPv6;
+
+
+    try
+    {
+      // Check first if the address is valid.
+      if (!IsValidIPv6(ipv6Address)) throw new ArgumentException("From Expand: Coudn't expand the address.");
+    }
+    catch (ArgumentException ex)
+    {
+      expandedIPv6.success = false;
+      expandedIPv6.message = ex.Message;
+      expandedIPv6.data = null;
+      return expandedIPv6;
+    }
+
+    // Check if the user input is just :: 
+    if (Regex.IsMatch(ipv6Address, doubleColonPattern))
+    {
+      expandedIPv6.success = true;
+      expandedIPv6.data = "0000:0000:0000:0000:0000:0000:0000:0000";
+      expandedIPv6.message = null;
+      return expandedIPv6;
+    }
+
+    // Add leading zeros if it has to.
+    segments = Regex.Matches(ipv6Address, segmentPattern).Select(match => match.Value).ToList();
+    for (int i = 0; i < segments.Count; i++)
+    {
+      string segment = segments[i];
+      if (segment.Length != 4)
+      {
+        int zeroesToPrepend = 4 - segment.Length;
+        string leadingZeroes = String.Concat(Enumerable.Repeat('0', zeroesToPrepend));
+        segments[i] = leadingZeroes + segment;        
+      }
+    }
+
+    // Turn double colon(::) into segments of zeros.
+    // Check if double colon(::) occurs at the end.
+    if (ipv6Address.Substring(ipv6Address.Length - 2, 2) == "::")
+    {
+      // Append segment of zeros until there's eight segments.
+      while (segments.Count != 8)
+      {
+        segments.Add("0000");
+      }
+    }
+    else
+    {
+      // Otherwise double colon(::) occurs somewhere not at the end.
+      // Find the index of the double-colon(::)
+      int toInsertAt = Array.IndexOf(ipv6Address.Split(':'), "");
+      // Keep adding until there's a total of 8 segments.
+      while (segments.Count != 8)
+      {
+        segments.Insert(toInsertAt, "0000");
+      }
+    }
+
+    
+    // Update message.
+    expandedIPv6.success = true;
+    expandedIPv6.message = null;
+    expandedIPv6.data = String.Join(':', segments);    
+    // Finally
+    return expandedIPv6;
+  }
+
+  /// <summary>
+  /// This method abbreviates an IPv6 address by removing leading zeroes
+  /// and turning a series of segments of zeroes.
+  /// </summary>
+  /// <param name="ipv6Address"></param>
+  /// <returns>
+  /// An object that has three properties: success and two nullable 
+  /// string type: message and data.
+  /// </returns>
+  public static IPv6ReturnData Abbreviate(string ipv6Address)
+  {
+    // Sanitize user input first.
+    ipv6Address = ipv6Address.Trim().ToLower();
+
+    // Regex Pattern
+    const string segmentAllZeroPattern = @"^0000$";
+    const string leadingZeroPattern = @"^0+";
+    // This pattern assumes the IPv6 Address has no leading zeros.
+    const string seriesOfZeroesPattern = @"(0(:0)){1,}";
+
+    string[] segments;
+
+    // Return data.
+    IPv6ReturnData abbreviatedIPv6;
+
+
+    // Try to expand the address first
+    try
+    {
+      // Validate the address first.
+      if (!IsValidIPv6(ipv6Address)) throw new ArgumentException("From Abbreviate: Coudn't abbreviate the address.");
+
+      IPv6ReturnData expandedIPv6 = Expand(ipv6Address);
+      if (!expandedIPv6.success) throw new ArgumentException("From Abbreviate: Coudn't abbreviate the address.");
+
+      // Set the segments.
+      if (expandedIPv6.data != null)
+      {
+        segments = expandedIPv6.data.Split(':');
+      }
+      else
+      {
+        throw new ArgumentException("From Abbreviate: Coudn't abbreviate the address.");
+      }
+
+      // Remove leading zeroes.
+      for (int i = 0; i < segments.Length; i++)
+      {
+        // Turn 0000 into 0.
+        if (Regex.IsMatch(segments[i], segmentAllZeroPattern))
+        {
+          segments[i] = "0";
+          continue;
+        }
+        
+        segments[i] = Regex.Replace(segments[i], leadingZeroPattern, "");
+      }
+
+
+    }
+    catch (System.Exception)
+    {
+      
+      throw;
+    }
+  }
 
 
 
