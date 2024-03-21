@@ -263,32 +263,34 @@ public class IPv6
         segments[i] = Regex.Replace(segments[i], leadingZeroPattern, "");
       }
 
-      // Get the instances of series of segments of zeroes.
       string ipv6Str = String.Join(':', segments);
+
+      // Get the instances of series of segments of zeroes if exist.
       string[] instances = Regex.Matches(ipv6Str, seriesOfZeroesPattern).Select(match => match.Value).ToArray();
-      // Choose the longest sequence.
-      string longestSequence;
       if (instances.Length != 0)
       {
+        // Choose the longest sequence.
         // Set the temporary longest sequence.
-        longestSequence = instances[0];
+        string longestSequence = instances[0];
         // Update the longest sequence.
         foreach (string instance in instances)
         {
           if (instance.Length > longestSequence.Length) longestSequence = instance;
         }
+
+        // Turn the longest sequence into double-colon (::)
+        // Update the data.
+        abbreviatedIPv6.data = Regex.Replace(ipv6Str, longestSequence, "::");
+        // The replace method above causes more than two of contiguous colons.
+        // So perform a replace again.
+        abbreviatedIPv6.data = Regex.Replace(abbreviatedIPv6.data, @":{3,}", "::");
       }
       else
       {
-        throw new ArgumentException("From Abbreviate: Coudn't get instances of series of zeroes.");
+        // Otherwise none
+        abbreviatedIPv6.data = ipv6Str;
       }
 
-      // Turn the longest sequence into double-colon (::)
-      // Update the data.
-      abbreviatedIPv6.data = Regex.Replace(ipv6Str, longestSequence, "::");
-      // The replace method above causes more than two of contiguous colons.
-      // So perform a replace again.
-      abbreviatedIPv6.data = Regex.Replace(abbreviatedIPv6.data, @":{3,}", "::");
     }
     catch (ArgumentException ex)
     {
