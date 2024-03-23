@@ -14,7 +14,7 @@ public class IPv6
   /// <summary>
   /// This method is used to check the format of IPv6 address.
   /// </summary>
-  /// <param name="ipv6Address"></param>
+  /// <param name="ipv6Address">An IPv6 addresss of type string.</param>
   /// <returns>Boolean.</returns>
   public static bool IsValidIPv6(string ipv6Address)
   {
@@ -117,10 +117,10 @@ public class IPv6
   /// by adding leading zeroes to segment and turning
   /// :: into a series of segment of zeroes.
   /// </summary>
-  /// <param name="ipv6Address"></param>
+  /// <param name="ipv6Address">An IPv6 address of type string.</param>
   /// <returns>
   /// An object that has three properties: success and two nullable 
-  /// string type: message and data.
+  /// string type: error and data.
   /// </returns>
   public static IPv6ReturnData Expand(string ipv6Address)
   {
@@ -210,7 +210,7 @@ public class IPv6
   /// <param name="ipv6Address"></param>
   /// <returns>
   /// An object that has three properties: success and two nullable 
-  /// string type: message and data.
+  /// string type: error and data.
   /// </returns>
   public static IPv6ReturnData Abbreviate(string ipv6Address)
   {
@@ -305,6 +305,33 @@ public class IPv6
     abbreviatedIPv6.error = null;
     // Finally. 
     return abbreviatedIPv6;
+  }
+
+
+  /// <summary>
+  /// This method validates whether the input strings a hex or not.
+  /// </summary>
+  /// <param name="hex">A string of hex digits.</param>
+  /// <returns>Boolean</returns>
+  public static bool IsHex(string hex)
+  {
+    // Sanitize input data first.
+    hex = hex.Trim().ToLower();
+
+    // Regex pattern
+    const string hexCharsPattern = @"[^0-9a-f]";
+
+    bool invalidHex;
+
+
+    // Validate input data first.
+    if (hex == null || hex == "") return false;
+
+    invalidHex = Regex.IsMatch(hex, hexCharsPattern);
+    if (invalidHex) return false;
+
+    // Finally
+    return true;
   }
 
 
