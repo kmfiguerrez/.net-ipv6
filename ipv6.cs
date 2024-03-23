@@ -8,6 +8,12 @@ public struct IPv6ReturnData
 
 }
 
+/*
+  In this class definitions. I decided to use hexadecimals and binaries 
+  as type string because:
+  - Hex includes letters.
+  - Data coming from user interfaces are of type string.
+*/
 public class IPv6
 {
 
@@ -329,6 +335,34 @@ public class IPv6
 
     invalidHex = Regex.IsMatch(hex, hexCharsPattern);
     if (invalidHex) return false;
+
+    // Finally
+    return true;
+  }
+
+
+  /// <summary>
+  /// This method validates if the input binary string a hex or not.
+  /// 
+  /// </summary>
+  /// <param name="binary">A string of binaries.</param>
+  /// <returns>Boolean</returns>
+  public static bool IsBinary(string binary)
+  {
+    // Sanitize input data first.
+    binary = binary.Trim().ToLower();
+
+    // Regex pattern
+    const string binaryCharsPattern = @"[^0-1]";
+
+    bool invalidBinary;
+
+
+    // Validates input data first.
+    if (binary == null || binary == "") return false;
+
+    invalidBinary = Regex.IsMatch(binary, binaryCharsPattern);
+    if (invalidBinary) return false;
 
     // Finally
     return true;

@@ -1,5 +1,5 @@
 ﻿const string ipv6Add = "0000:0000:3:0000:0000:0000:0:0008";
-bool res = IPv6.IsHex("fg");
+bool res = IPv6.IsBinary("10");
 
 Console.WriteLine(res);
 
