@@ -254,6 +254,7 @@ public class IPv6
       //   throw new ArgumentException("From Abbreviate: Coudn't abbreviate the address.");
       // }
 
+      // data is not null here because of the above validation.
       segments = expandedIPv6.data.Split(':');
 
       // Remove leading zeroes.
@@ -366,6 +367,69 @@ public class IPv6
 
     // Finally
     return true;
+  }
+
+
+  /// <summary>
+  /// This method converts hexadecimals to binary.
+  /// Note that the return value does not omit leading zeroes.
+  /// </summary>
+  /// 
+  /// <param name="hex">A string hex digits.</param>
+  /// 
+  /// <returns>
+  /// An object that has three properties: success and two nullable 
+  /// string type: error and data.
+  /// </returns>
+  public static IPv6ReturnData ToBinary(string hexadecimals)
+  {
+    // Sanitize input data first.
+    hexadecimals = hexadecimals.Trim().ToLower();
+
+    string binaries = "";
+    
+    // Return data.
+    IPv6ReturnData binaryData;
+
+
+    // Validate input data first.
+    try
+    {
+      if (!IsHex(hexadecimals)) throw new ArgumentException("From ToBinary: Invalid Hex digits provided.");
+    }
+    catch (ArgumentException ex)
+    {
+      binaryData.success = false;
+      binaryData.error = ex.Message;
+      binaryData.data = null;
+      return binaryData;
+    }
+
+    /*
+      Because the value (2 ** 55) lose precision we have to convert
+      individual hex from input if multiple hex are given rather than
+      the whole hexadecimals in one go.        
+    */
+    foreach (char hex in hexadecimals)
+    {
+      // First, convert hex to integer.
+      // byte is an unsigned integer that can hold values from 0 to 255.
+      byte integer = Convert.ToByte(hex.ToString(), 16);
+
+      // Then convert from integer to binary.
+      string binary = Convert.ToString(integer, 2);
+
+      // Because toString method does not add leading zeros
+      // we have to prepend leading zeros.
+      // byte zeroesToPrepend = (byte)(4 - binary.Length);
+      binaries += binary.PadLeft(4, '0');
+    }
+
+    // Update return data.
+    binaryData.success = true;
+    binaryData.error = null;
+    binaryData.data = binaries;
+    return binaryData;
   }
 
 
