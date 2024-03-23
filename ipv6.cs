@@ -172,9 +172,7 @@ public class IPv6
       string segment = segments[i];
       if (segment.Length != 4)
       {
-        int zeroesToPrepend = 4 - segment.Length;
-        string leadingZeroes = String.Concat(Enumerable.Repeat('0', zeroesToPrepend));
-        segments[i] = leadingZeroes + segment;        
+        segments[i] = segment.PadLeft(4, '0');        
       }
     }
 
@@ -429,6 +427,7 @@ public class IPv6
     binaryData.success = true;
     binaryData.error = null;
     binaryData.data = binaries;
+    // Finally
     return binaryData;
   }
 
