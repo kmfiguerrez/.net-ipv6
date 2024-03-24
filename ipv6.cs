@@ -421,7 +421,7 @@ internal static class IPv6
       // Because toString method does not add leading zeros
       // we have to prepend leading zeros.
       // byte zeroesToPrepend = (byte)(4 - binary.Length);
-      binaries += binary.PadLeft(4, '0');
+      binaries = binary.PadLeft(4, '0');
     }
 
     // Update return data.
@@ -434,43 +434,206 @@ internal static class IPv6
 
 
   /// <summary>
-  /// 
+  /// Converts positive integers (range from 0 to 255) into binary.
   /// </summary>
-  /// <param name="integer"></param>
-  /// <returns></returns>
-  internal static IPv6ReturnData ToBinary(int integer)
+  /// <param name="integer">A positive integers range from 0 to 255.</param>
+  /// <returns>
+  /// An object that has three properties: success and two nullable 
+  /// string type: error and data.
+  /// </returns>
+  internal static IPv6ReturnData ToBinary(byte integer)
   {
-    string binaries = "";
+    string binaries;
     
     // Return data
     IPv6ReturnData binaryData;
 
 
+    // Convert integer to binary.
+    binaries = Convert.ToString(integer, 2);
+
     // Update return data.
     binaryData.success = true;
     binaryData.error = null;
     binaryData.data = binaries;
+
+    // Finally.
     return binaryData;
   }
 
 
-
-  internal static IPv6ReturnData ToBinary(BigInteger integer)
+  /// <summary>
+  /// Converts positive integers (range from 0 to 65,535) into binary.
+  /// </summary>
+  /// <param name="integer">A positive integers (range from 0 to 65,535).</param>
+  /// <returns>
+  /// An object that has three properties: success and two nullable 
+  /// string type: error and data.
+  /// </returns>
+  internal static IPv6ReturnData ToBinary(ushort integer)
   {
-    string binaries = "";
+    string binaries;
     
     // Return data
     IPv6ReturnData binaryData;
 
 
+    // Convert integer to binary.
+    binaries = Convert.ToString(integer, 2);
+
     // Update return data.
     binaryData.success = true;
     binaryData.error = null;
     binaryData.data = binaries;
+
+    // Finally.
     return binaryData;
-  }  
+  }
 
 
+  /// <summary>
+  /// Converts positive integers (range from 0 to 2,147,483,647) into binary.
+  /// </summary>
+  /// <param name="integer">A positive integers (range from 0 to 2,147,483,647).</param>
+  /// <returns>
+  /// An object that has three properties: success and two nullable 
+  /// string type: error and data.
+  /// </returns>
+  internal static IPv6ReturnData ToBinary(uint integer)
+  {
+    string binaries;
+    
+    // Return data
+    IPv6ReturnData binaryData;
+
+
+    // Convert integer to binary.
+    binaries = Convert.ToString(integer, 2);
+
+    // Update return data.
+    binaryData.success = true;
+    binaryData.error = null;
+    binaryData.data = binaries;
+
+    // Finally.
+    return binaryData;
+  }
+
+
+  /// <summary>
+  /// Converts positive integers (range from 0 to 18,446,744,073,709,551,615) into binary.
+  /// </summary>
+  /// <param name="integer">A positive integers (range from 0 to 18,446,744,073,709,551,615).</param>
+  /// <returns>
+  /// An object that has three properties: success and two nullable 
+  /// string type: error and data.
+  /// </returns>
+  internal static IPv6ReturnData ToBinary(ulong integer)
+  {
+    string binaries;
+    
+    // Return data
+    IPv6ReturnData binaryData;
+
+
+    /*
+      Covert integer to binary.
+      Since Convert.ToString doesn't have a method signature for UInt64,
+      we have to cast it to Int64 (long).
+    */
+    binaries = Convert.ToString((long)integer, 2);
+
+    // Update return data.
+    binaryData.success = true;
+    binaryData.error = null;
+    binaryData.data = binaries;
+
+    // Finally.
+    return binaryData;
+  }
+
+
+  /// <summary>
+  /// Converts a positive integers that is greater than max value of ulong type.
+  /// </summary>
+  /// <param name="integer">A positive integers that is greater than max value of ulong type.</param>
+  /// <returns>
+  /// An object that has three properties: success and two nullable 
+  /// string type: error and data.
+  // /// </returns>
+  internal static IPv6ReturnData ToBinary(BigInteger integer)
+  {
+    string binaries;
+    
+    // Return data
+    IPv6ReturnData binaryData;
+
+
+    /*
+      Covert integer to binary.
+      Since Convert.ToString doesn't have a method signature for BigInteger,
+      we have to create our own method to do that and created 
+      ConvertIntegerToBinary method.
+    */
+    binaries = ConvertIntegerToBinary(integer);
+
+    // Update return data.
+    binaryData.success = true;
+    binaryData.error = null;
+    binaryData.data = binaries;
+
+    // Finally.
+    return binaryData;
+  }
+
+
+  /// <summary>
+  /// This method converts positive integers to binaries. Can also convert 
+  /// integers greater than (2 raised to 64).
+  /// </summary>
+  /// <param name="integer">A positive integers</param>
+  /// <returns>A string of binaries.</returns>
+  internal static string ConvertIntegerToBinary(BigInteger integer)
+  {
+    /*
+      The logic used to get the binary in this method is the tradional
+      method of converting decimal to binary by subtraction.
+    */
+
+    BigInteger decimalForm = integer;
+    BigInteger exponent = BigInteger.Log2(decimalForm);
+
+    BigInteger currentPlaceValue;
+    const sbyte numbericBase = 2;
+
+    List<char> bits = [];
+    string binary;
+    
+
+    for (BigInteger i = exponent; !(i <= -1); i--)
+    {
+      currentPlaceValue = BigInteger.Pow(numbericBase, (int)i);
+      // Console.WriteLine($"2 raised to {i} - place value: {currentPlaceValue}");
+
+      if (currentPlaceValue <= decimalForm)
+      {
+        // Append 1
+        bits.Add('1');
+
+        decimalForm -= currentPlaceValue;
+
+        continue;
+      }
+
+      // Otherwise, append 0;
+      bits.Add('0');
+    }
+
+    binary = String.Join("", bits);
+
+    // Finally.
+    return binary;
+  }
 
 
 
