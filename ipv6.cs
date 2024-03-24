@@ -1,10 +1,11 @@
+using System.Numerics;
 using System.Text.RegularExpressions;
 
-public struct IPv6ReturnData
+internal struct IPv6ReturnData
 {
-  public bool success;
-  public string? data;
-  public string? error;
+  internal bool success;
+  internal string? data;
+  internal string? error;
 
 }
 
@@ -14,7 +15,7 @@ public struct IPv6ReturnData
   - Hex includes letters.
   - Data coming from user interfaces are of type string.
 */
-public class IPv6
+internal static class IPv6
 {
 
   /// <summary>
@@ -22,7 +23,7 @@ public class IPv6
   /// </summary>
   /// <param name="ipv6Address">An IPv6 addresss of type string.</param>
   /// <returns>Boolean.</returns>
-  public static bool IsValidIPv6(string ipv6Address)
+  internal static bool IsValidIPv6(string ipv6Address)
   {
     // Sanitize user input first.
     ipv6Address = ipv6Address.Trim().ToLower();
@@ -128,7 +129,7 @@ public class IPv6
   /// An object that has three properties: success and two nullable 
   /// string type: error and data.
   /// </returns>
-  public static IPv6ReturnData Expand(string ipv6Address)
+  internal static IPv6ReturnData Expand(string ipv6Address)
   {
     // Sanitize user input first.
     ipv6Address = ipv6Address.Trim().ToLower();
@@ -216,7 +217,7 @@ public class IPv6
   /// An object that has three properties: success and two nullable 
   /// string type: error and data.
   /// </returns>
-  public static IPv6ReturnData Abbreviate(string ipv6Address)
+  internal static IPv6ReturnData Abbreviate(string ipv6Address)
   {
     // Sanitize user input first.
     ipv6Address = ipv6Address.Trim().ToLower();
@@ -318,7 +319,7 @@ public class IPv6
   /// </summary>
   /// <param name="hex">A string of hex digits.</param>
   /// <returns>Boolean</returns>
-  public static bool IsHex(string hex)
+  internal static bool IsHex(string hex)
   {
     // Sanitize input data first.
     hex = hex.Trim().ToLower();
@@ -346,7 +347,7 @@ public class IPv6
   /// </summary>
   /// <param name="binary">A string of binaries.</param>
   /// <returns>Boolean</returns>
-  public static bool IsBinary(string binary)
+  internal static bool IsBinary(string binary)
   {
     // Sanitize input data first.
     binary = binary.Trim().ToLower();
@@ -379,7 +380,7 @@ public class IPv6
   /// An object that has three properties: success and two nullable 
   /// string type: error and data.
   /// </returns>
-  public static IPv6ReturnData ToBinary(string hexadecimals)
+  internal static IPv6ReturnData ToBinary(string hexadecimals)
   {
     // Sanitize input data first.
     hexadecimals = hexadecimals.Trim().ToLower();
@@ -431,6 +432,43 @@ public class IPv6
     return binaryData;
   }
 
+
+  /// <summary>
+  /// 
+  /// </summary>
+  /// <param name="integer"></param>
+  /// <returns></returns>
+  internal static IPv6ReturnData ToBinary(int integer)
+  {
+    string binaries = "";
+    
+    // Return data
+    IPv6ReturnData binaryData;
+
+
+    // Update return data.
+    binaryData.success = true;
+    binaryData.error = null;
+    binaryData.data = binaries;
+    return binaryData;
+  }
+
+
+
+  internal static IPv6ReturnData ToBinary(BigInteger integer)
+  {
+    string binaries = "";
+    
+    // Return data
+    IPv6ReturnData binaryData;
+
+
+    // Update return data.
+    binaryData.success = true;
+    binaryData.error = null;
+    binaryData.data = binaries;
+    return binaryData;
+  }  
 
 
 
