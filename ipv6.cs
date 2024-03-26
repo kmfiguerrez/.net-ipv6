@@ -196,12 +196,18 @@ internal static class IPv6
   /// This method abbreviates an IPv6 address by removing leading zeroes
   /// and turning a series of segments of zeroes.
   /// </summary>
+  /// 
   /// <param name="ipv6Address"></param>
+  /// 
   /// <returns>
   /// An object that has three properties: success and two nullable 
   /// string type: error and data.
   /// </returns>
-  internal static IPv6ReturnData Abbreviate(string ipv6Address)
+  /// 
+  /// <exception cref="ArgumentException">
+  /// Throws an exception if the input IPv6 address is not valid.
+  /// </exception>
+  internal static string Abbreviate(string ipv6Address)
   {
     // Sanitize user input first.
     ipv6Address = ipv6Address.Trim().ToLower();
@@ -215,30 +221,18 @@ internal static class IPv6
     string[] segments;
 
     // Return data.
-    IPv6ReturnData abbreviatedIPv6;
+    string abbreviatedIPv6;
 
 
+    // Validate the input address first.
+    if (!IsValidIPv6(ipv6Address)) throw new ArgumentException("From Abbreviate: Provided invalid IPv6 address.");
+    
     // Try to expand the address first
     try
     {
-      // Validate the address first.
-      if (!IsValidIPv6(ipv6Address)) throw new ArgumentException("From Abbreviate: Provided invalid IPv6 address.");
+      string expandedIPv6 = Expand(ipv6Address);
 
-      IPv6ReturnData expandedIPv6 = Expand(ipv6Address);
-      if (!expandedIPv6.success) throw new ArgumentException("From Abbreviate: Expanding Part Failed.");
-
-      // Set the segments.
-      // if (expandedIPv6.data != null)
-      // {
-      //   segments = expandedIPv6.data.Split(':');
-      // }
-      // else
-      // {
-      //   throw new ArgumentException("From Abbreviate: Coudn't abbreviate the address.");
-      // }
-
-      // data is not null here because of the above validation.
-      segments = expandedIPv6.data.Split(':');
+      segments = expandedIPv6.Split(':');
 
       // Remove leading zeroes.
       for (int i = 0; i < segments.Length; i++)
@@ -253,6 +247,7 @@ internal static class IPv6
         segments[i] = Regex.Replace(segments[i], leadingZeroPattern, "");
       }
 
+      // Combine the segments into a single string as IPv6 address.
       string ipv6Str = String.Join(':', segments);
 
       // Get the instances of series of segments of zeroes if exist.
@@ -269,30 +264,22 @@ internal static class IPv6
         }
 
         // Turn the longest sequence into double-colon (::)
-        // Update the data.
-        abbreviatedIPv6.data = Regex.Replace(ipv6Str, longestSequence, "::");
+        abbreviatedIPv6 = Regex.Replace(ipv6Str, longestSequence, "::");
         // The replace method above causes more than two of contiguous colons.
         // So perform a replace again.
-        abbreviatedIPv6.data = Regex.Replace(abbreviatedIPv6.data, @":{3,}", "::");
+        abbreviatedIPv6 = Regex.Replace(abbreviatedIPv6, @":{3,}", "::");
       }
       else
       {
         // Otherwise none
-        abbreviatedIPv6.data = ipv6Str;
+        abbreviatedIPv6 = ipv6Str;
       }
-
     }
-    catch (ArgumentException ex)
+    catch (ArgumentException)
     {
-      abbreviatedIPv6.success = false;
-      abbreviatedIPv6.data = null;
-      abbreviatedIPv6.error = ex.Message;
-      return abbreviatedIPv6;
+      throw new ArgumentException("From Abbreviate: Expanding Part Failed.");
     }
 
-    // Update the return data.
-    abbreviatedIPv6.success = true;
-    abbreviatedIPv6.error = null;
     // Finally. 
     return abbreviatedIPv6;
   }
@@ -355,38 +342,27 @@ internal static class IPv6
 
   /// <summary>
   /// This method converts hexadecimals to binary.
-  /// Note that the return value does not omit leading zeroes.
   /// </summary>
   /// 
   /// <param name="hex">A string hex digits.</param>
   /// 
   /// <returns>
-  /// An object that has three properties: success and two nullable 
-  /// string type: error and data.
+  /// A string of binaries
   /// </returns>
-  internal static IPv6ReturnData ToBinary(string hexadecimals)
+  /// 
+  /// <exception cref="ArgumentException">
+  /// Throws an exception if the input hexadecimals is not valid.
+  /// </exception>  
+  internal static string ToBinary(string hexadecimals)
   {
     // Sanitize input data first.
     hexadecimals = hexadecimals.Trim().ToLower();
-
-    string binaries = "";
-    
     // Return data.
-    IPv6ReturnData binaryData;
+    string binaries = "";
 
 
     // Validate input data first.
-    try
-    {
-      if (!IsHex(hexadecimals)) throw new ArgumentException("From ToBinary: Invalid Hex digits provided.");
-    }
-    catch (ArgumentException ex)
-    {
-      binaryData.success = false;
-      binaryData.error = ex.Message;
-      binaryData.data = null;
-      return binaryData;
-    }
+    if (!IsHex(hexadecimals)) throw new ArgumentException("From ToBinary: Invalid Hex digits provided.");
 
     /*
       Because the value (2 ** 55) lose precision we have to convert
@@ -404,45 +380,35 @@ internal static class IPv6
 
       // Because toString method does not add leading zeros
       // we have to prepend leading zeros.
-      // byte zeroesToPrepend = (byte)(4 - binary.Length);
-      binaries = binary.PadLeft(4, '0');
+      binaries += binary.PadLeft(4, '0');
     }
 
-    // Update return data.
-    binaryData.success = true;
-    binaryData.error = null;
-    binaryData.data = binaries;
-    // Finally
-    return binaryData;
+    // Finally.
+    return binaries;
   }
 
 
   /// <summary>
-  /// Converts positive integers (range from 0 to 255) into binary.
+  /// Converts positive integers into binary.
   /// </summary>
+  /// 
   /// <param name="integer">A positive integers range from 0 to 255.</param>
   /// <returns>
+  /// 
   /// An object that has three properties: success and two nullable 
   /// string type: error and data.
   /// </returns>
-  internal static IPv6ReturnData ToBinary(byte integer)
+  internal static string ToBinary(byte integer)
   {
-    string binaries;
-    
     // Return data
-    IPv6ReturnData binaryData;
+    string binaries;
 
 
     // Convert integer to binary.
     binaries = Convert.ToString(integer, 2);
 
-    // Update return data.
-    binaryData.success = true;
-    binaryData.error = null;
-    binaryData.data = binaries;
-
     // Finally.
-    return binaryData;
+    return binaries;
   }
 
 
