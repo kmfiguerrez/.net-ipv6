@@ -235,12 +235,16 @@ internal static class IPv6
     string abbreviatedIPv6;
 
 
-    // Validate the input address first.
-    if (!IsValidIPv6(ipv6Address)) throw new ArgumentException("From Abbreviate: Provided invalid IPv6 address.");
     
     // Try to expand the address first
     try
     {
+      /*
+        Input data validation of this method relies on Expand method because
+        it also validates the same argument which is the IPv6 addresss of
+        type string. This way avoids slowing down the application by not
+        having the same data validation.
+      */
       string expandedIPv6 = Expand(ipv6Address);
 
       segments = expandedIPv6.Split(':');
@@ -640,16 +644,86 @@ internal static class IPv6
   {
     // Sanitize input data first.
     binary = binary.Trim();
+
     // Return data.
-    string hexadecimals = "";
+    string hexadecimals;
+
 
     // Validate input data first.
-    if (!IsHex(binary)) throw new ArgumentException("From ToHex: Invalid argument binaries.");
+    if (!IsHex(binary)) throw new ArgumentException("From ToHex: Invalid argument binaries provided.");
 
+    /*
+      Because c# doesn't have a built-in method for converting integers
+      greater than 2^64 or integers of type BigInteger, we have to create
+      a method that converts typed string binaries to hexadecimals.
+    */
+    hexadecimals = ConvertBinaryToHex(binary);
+    
+    // Finally.
     return hexadecimals;
   }
 
 
+  /// <summary>
+  /// Converts binary to hexadecimals.
+  /// </summary>
+  /// 
+  /// <param name="binary">A string of postive binaries.</param>
+  /// 
+  /// <returns>A string of positive hex digits.</returns>
+  /// 
+
+  private static string ConvertBinaryToHex(string binary)
+  {
+    /*
+      Input data validation for this method relies on the method caller
+      of this method to avoid slowing down the application by having
+      multiple data validation.
+    */
+
+    // Sanitize input data first.
+    binary = binary.Trim();
+
+    bool divisibleByFour = binary.Length % 4 == 0;
+    
+    List<string> nibbles = [];
+    string hexadecimals;
+
+
+    // Check if not divisible by four.
+    if (!divisibleByFour)
+    {
+      // Extract the first x bits.
+      sbyte bits = (sbyte)(binary.Length % 4);
+      // Turn it to hex and append it to list of nibbles.
+      byte integer =  Convert.ToByte(binary.Substring(0, bits), 2);
+      string hex = Convert.ToString(integer, 16);
+      nibbles.Add(hex);
+
+      // Then remove the extracted bits to binary.
+      binary = binary.Substring(bits);
+    }
+
+    // Otherwise divisible by four.
+    for (int i = 0; i < binary.Length; i+=4)
+    {
+      // Extract four bits on each iteration.
+      string nibble = binary.Substring(i,4);
+      // Convert four bits to decimal form.
+      byte integer = Convert.ToByte(nibble, 2);
+      // From decimal to hexadecimals.
+      string hex = Convert.ToString(integer, 16);
+      // Console.WriteLine($"Bits: {nibble} - Dec: {integer} - Hex: {hex}");
+
+      // Append it to the list.
+      nibbles.Add(hex);
+    }
+
+    // Turn list of nibbles into a single string.
+    hexadecimals = String.Join("", nibbles);
+    // Finally.
+    return hexadecimals;
+  }
 
 
 
