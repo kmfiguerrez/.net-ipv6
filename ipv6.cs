@@ -122,10 +122,10 @@ internal static class IPv6
   /// </summary>
   /// 
   /// <remarks>
-  /// Throws an exception if fails to complete.
+  /// Throws an exception if provided with invalid IPv6 address.
   /// </remarks>
   /// 
-  /// <param name="ipv6Address">An IPv6 address of type string.</param>
+  /// <param name="ipv6Address">A string IPv6 address.</param>
   /// 
   /// <returns>
   /// Expanded IPv6 address
@@ -205,10 +205,10 @@ internal static class IPv6
   /// </summary>
   /// 
   /// <remarks>
-  /// Throws an exception if fails to complete.
+  /// Throws an exception if provided with invalid IPv6 address.
   /// </remarks>
   /// 
-  /// <param name="ipv6Address"></param>
+  /// <param name="ipv6Address">A string IPv6 address.</param>
   /// 
   /// <returns>
   /// An object that has three properties: success and two nullable 
@@ -352,11 +352,25 @@ internal static class IPv6
 
 
   /// <summary>
-  /// This method converts positive hexadecimals to binary.
+  /// Converts hexadecimals to binary.
   /// </summary>
   /// 
   /// <remarks>
-  /// Throws an exception if fails to complete.
+  /// Notes:
+  ///   <list type="bullet">
+  ///     <item>
+  ///       <description>
+  ///         Argument <c><paramref name="hexadecimals"/></c> is typed <c>string</c>, not a number literal prefixed
+  ///         with <c>0x</c> or <c>0X</c> and must be positive.
+  ///       </description>
+  ///     </item>
+  ///     <item>
+  ///       <description>
+  ///         This method throws an exception if not provided with the 
+  ///         desired argument.
+  ///       </description>
+  ///     </item>
+  ///   </list>
   /// </remarks>
   /// 
   /// <param name="hexadecimals">A string positive hex digits.</param>
@@ -593,6 +607,47 @@ internal static class IPv6
   }
 
 
+  /// <summary>
+  /// Converts binaries into hexadecimals.
+  /// </summary>
+  /// 
+  /// <remarks>
+  /// Notes:
+  ///   <list type="bullet">
+  ///     <item>
+  ///       <description>
+  ///         Argument <c><paramref name="binary"/></c> is typed <c>string</c>, not a number literal prefixed
+  ///         with <c>0b</c> or <c>0B</c> and must be positive.
+  ///       </description>
+  ///     </item>
+  ///     <item>
+  ///       <description>
+  ///         This method throws an exception if not provided with the 
+  ///         desired argument.
+  ///       </description>
+  ///     </item>
+  ///   </list>
+  /// </remarks>
+  /// 
+  /// <param name="binary">A string positive binaries.</param>
+  /// 
+  /// <returns>A string of hexadecimals.</returns>
+  /// 
+  /// <exception cref="ArgumentException">
+  /// Throws an exception if given an invalid binaries.
+  /// </exception>
+  internal static string ToHex(string binary)
+  {
+    // Sanitize input data first.
+    binary = binary.Trim();
+    // Return data.
+    string hexadecimals = "";
+
+    // Validate input data first.
+    if (!IsHex(binary)) throw new ArgumentException("From ToHex: Invalid argument binaries.");
+
+    return hexadecimals;
+  }
 
 
 
