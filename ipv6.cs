@@ -1,13 +1,6 @@
 using System.Numerics;
 using System.Text.RegularExpressions;
 
-internal struct IPv6ReturnData
-{
-  internal bool success;
-  internal string? data;
-  internal string? error;
-
-}
 
 /*
   In this class definitions. I decided to use hexadecimals and binaries 
@@ -19,7 +12,7 @@ internal static class IPv6
 {
 
   /// <summary>
-  /// This method is used to check the format of IPv6 address.
+  /// This method is used to validate the format of IPv6 address.
   /// </summary>
   /// <param name="ipv6Address">An IPv6 addresss of type string.</param>
   /// <returns>Boolean.</returns>
@@ -556,11 +549,14 @@ internal static class IPv6
   /// <summary>
   /// Converts a positive integers that is greater than max value of ulong type.
   /// </summary>
-  /// <param name="integer">A positive integers that is greater than max value of ulong type.</param>
+  /// <param name="integer">
+  /// A positive integers that is greater than max value of ulong type.
+  /// Must be in BigInt format.
+  /// </param>
   /// <returns>
   /// An object that has three properties: success and two nullable 
   /// string type: error and data.
-  // /// </returns>
+  /// </returns>
   internal static IPv6ReturnData ToBinary(BigInteger integer)
   {
     string binaries;
@@ -571,8 +567,8 @@ internal static class IPv6
 
     /*
       Covert integer to binary.
-      Since Convert.ToString doesn't have a method signature for BigInteger,
-      we have to create our own method to do that and created 
+      Since c# doesn't have a built-in method to convert BigInteger to
+      binary we have to create our own method to do that and created 
       ConvertIntegerToBinary method.
     */
     binaries = ConvertIntegerToBinary(integer);
@@ -593,9 +589,11 @@ internal static class IPv6
   /// </summary>
   /// <param name="integer">A positive integers</param>
   /// <returns>A string of binaries.</returns>
-  internal static string ConvertIntegerToBinary(BigInteger integer)
+  private static string ConvertIntegerToBinary(BigInteger integer)
   {
     /*
+      Had to create this method because c# doesn't have a built-in 
+      methods to convert bigint numbers to binary. 
       The logic used to get the binary in this method is the tradional
       method of converting decimal to binary by subtraction.
     */
