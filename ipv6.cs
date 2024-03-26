@@ -7,6 +7,9 @@ using System.Text.RegularExpressions;
   as type string because:
   - Hex includes letters.
   - Data coming from user interfaces are of type string.
+
+  Exceptions to above statements.
+  - Hexadecimals as argument to ToDecimal will be an integral type.
 */
 internal static class IPv6
 {
@@ -118,6 +121,10 @@ internal static class IPv6
   /// :: into a series of segment of zeroes.
   /// </summary>
   /// 
+  /// <remarks>
+  /// Throws an exception if fails to complete.
+  /// </remarks>
+  /// 
   /// <param name="ipv6Address">An IPv6 address of type string.</param>
   /// 
   /// <returns>
@@ -196,6 +203,10 @@ internal static class IPv6
   /// This method abbreviates an IPv6 address by removing leading zeroes
   /// and turning a series of segments of zeroes.
   /// </summary>
+  /// 
+  /// <remarks>
+  /// Throws an exception if fails to complete.
+  /// </remarks>
   /// 
   /// <param name="ipv6Address"></param>
   /// 
@@ -341,10 +352,14 @@ internal static class IPv6
 
 
   /// <summary>
-  /// This method converts hexadecimals to binary.
+  /// This method converts positive hexadecimals to binary.
   /// </summary>
   /// 
-  /// <param name="hex">A string hex digits.</param>
+  /// <remarks>
+  /// Throws an exception if fails to complete.
+  /// </remarks>
+  /// 
+  /// <param name="hexadecimals">A string positive hex digits.</param>
   /// 
   /// <returns>
   /// A string of binaries
@@ -393,10 +408,9 @@ internal static class IPv6
   /// </summary>
   /// 
   /// <param name="integer">A positive integers range from 0 to 255.</param>
-  /// <returns>
   /// 
-  /// An object that has three properties: success and two nullable 
-  /// string type: error and data.
+  /// <returns>
+  /// A string of binaries
   /// </returns>
   internal static string ToBinary(byte integer)
   {
@@ -413,77 +427,64 @@ internal static class IPv6
 
 
   /// <summary>
-  /// Converts positive integers (range from 0 to 65,535) into binary.
+  /// Converts positive integers into binary.
   /// </summary>
+  /// 
   /// <param name="integer">A positive integers (range from 0 to 65,535).</param>
+  /// 
   /// <returns>
-  /// An object that has three properties: success and two nullable 
-  /// string type: error and data.
+  /// A string of binaries
   /// </returns>
-  internal static IPv6ReturnData ToBinary(ushort integer)
+  internal static string ToBinary(ushort integer)
   {
-    string binaries;
-    
     // Return data
-    IPv6ReturnData binaryData;
+    string binaries;
 
 
     // Convert integer to binary.
     binaries = Convert.ToString(integer, 2);
 
-    // Update return data.
-    binaryData.success = true;
-    binaryData.error = null;
-    binaryData.data = binaries;
-
     // Finally.
-    return binaryData;
+    return binaries;
   }
 
 
   /// <summary>
-  /// Converts positive integers (range from 0 to 2,147,483,647) into binary.
+  /// Converts positive integers into binary.
   /// </summary>
+  /// 
   /// <param name="integer">A positive integers (range from 0 to 2,147,483,647).</param>
+  /// 
   /// <returns>
-  /// An object that has three properties: success and two nullable 
-  /// string type: error and data.
+  /// A string of binaries
   /// </returns>
-  internal static IPv6ReturnData ToBinary(uint integer)
+  internal static string ToBinary(uint integer)
   {
-    string binaries;
-    
     // Return data
-    IPv6ReturnData binaryData;
+    string binaries;
 
 
     // Convert integer to binary.
     binaries = Convert.ToString(integer, 2);
 
-    // Update return data.
-    binaryData.success = true;
-    binaryData.error = null;
-    binaryData.data = binaries;
-
     // Finally.
-    return binaryData;
+    return binaries;
   }
 
 
   /// <summary>
-  /// Converts positive integers (range from 0 to 18,446,744,073,709,551,615) into binary.
+  /// Converts positive integers into binary.
   /// </summary>
+  /// 
   /// <param name="integer">A positive integers (range from 0 to 18,446,744,073,709,551,615).</param>
+  /// 
   /// <returns>
-  /// An object that has three properties: success and two nullable 
-  /// string type: error and data.
+  /// A string of binaries
   /// </returns>
-  internal static IPv6ReturnData ToBinary(ulong integer)
+  internal static string ToBinary(ulong integer)
   {
-    string binaries;
-    
     // Return data
-    IPv6ReturnData binaryData;
+    string binaries;
 
 
     /*
@@ -493,34 +494,38 @@ internal static class IPv6
     */
     binaries = Convert.ToString((long)integer, 2);
 
-    // Update return data.
-    binaryData.success = true;
-    binaryData.error = null;
-    binaryData.data = binaries;
-
     // Finally.
-    return binaryData;
+    return binaries;
   }
 
 
   /// <summary>
-  /// Converts a positive integers that is greater than max value of ulong type.
+  /// Converts a positive integers that is greater than max value of ulong type
+  /// or 2^64.
   /// </summary>
+  /// 
+  /// <remarks>
+  /// Throws an exception if argument is not a positive bigint.
+  /// </remarks>
+  /// 
   /// <param name="integer">
-  /// A positive integers that is greater than max value of ulong type.
-  /// Must be in BigInt format.
+  /// A positive bigint integers that is greater than max value of ulong type.
   /// </param>
+  /// 
   /// <returns>
-  /// An object that has three properties: success and two nullable 
-  /// string type: error and data.
+  /// A string of binaries
   /// </returns>
-  internal static IPv6ReturnData ToBinary(BigInteger integer)
+  /// 
+  /// <exception cref="ArgumentException">
+  /// Throws an exception if the input bigint is not positive.
+  /// </exception>  
+  internal static string ToBinary(BigInteger integer)
   {
-    string binaries;
-    
     // Return data
-    IPv6ReturnData binaryData;
+    string binaries;
 
+    // Input integer must be positive.
+    if (integer < 0) throw new ArgumentException("From ToBinary: bigint Integer must be positive.");
 
     /*
       Covert integer to binary.
@@ -530,13 +535,8 @@ internal static class IPv6
     */
     binaries = ConvertIntegerToBinary(integer);
 
-    // Update return data.
-    binaryData.success = true;
-    binaryData.error = null;
-    binaryData.data = binaries;
-
     // Finally.
-    return binaryData;
+    return binaries;
   }
 
 
@@ -544,7 +544,9 @@ internal static class IPv6
   /// This method converts positive integers to binaries. Can also convert 
   /// integers greater than (2 raised to 64).
   /// </summary>
+  /// 
   /// <param name="integer">A positive integers</param>
+  /// 
   /// <returns>A string of binaries.</returns>
   private static string ConvertIntegerToBinary(BigInteger integer)
   {
