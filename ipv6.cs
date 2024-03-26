@@ -371,13 +371,21 @@ internal static class IPv6
   ///     <item>
   ///       <description>
   ///         This method throws an exception if not provided with the 
-  ///         desired argument.
+  ///         desired hexadecimals argument.
+  ///       </description>
+  ///     </item>
+  ///     <item>
+  ///       <description>
+  ///         Argument <c><paramref name="includeLeadingZeroes"/></c> when
+  ///         set to true will include leading zeroes of the returned
+  ///         binaries.
   ///       </description>
   ///     </item>
   ///   </list>
   /// </remarks>
   /// 
   /// <param name="hexadecimals">A string positive hex digits.</param>
+  /// <param name="includeLeadingZeroes">Boolean.</param>
   /// 
   /// <returns>
   /// A string of binaries
@@ -386,10 +394,14 @@ internal static class IPv6
   /// <exception cref="ArgumentException">
   /// Throws an exception if the input hexadecimals is not valid.
   /// </exception>  
-  internal static string ToBinary(string hexadecimals)
+  internal static string ToBinary(string hexadecimals, bool includeLeadingZeroes = false)
   {
     // Sanitize input data first.
     hexadecimals = hexadecimals.Trim().ToLower();
+
+    // Leading zeros pattern.
+    const string leadingZeroPattern = @"^0+";
+
     // Return data.
     string binaries = "";
 
@@ -411,9 +423,22 @@ internal static class IPv6
       // Then convert from integer to binary.
       string binary = Convert.ToString(integer, 2);
 
-      // Because toString method does not add leading zeros
-      // we have to prepend leading zeros.
+      /*
+        Because toString method does not add leading zeros
+        we have to prepend leading zeros which is important
+        at this part of the process.      
+      */
       binaries += binary.PadLeft(4, '0');
+    }
+
+    /*
+      The final binaries leading zeroes does not affect the value.
+      By default are omitted. Otherwise included if param includeLeadingZeroes
+      set to true.
+    */
+    if (!includeLeadingZeroes)
+    {
+      binaries = Regex.Replace(binaries, leadingZeroPattern, "");
     }
 
     // Finally.
