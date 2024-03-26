@@ -117,12 +117,17 @@ internal static class IPv6
   /// by adding leading zeroes to segment and turning
   /// :: into a series of segment of zeroes.
   /// </summary>
+  /// 
   /// <param name="ipv6Address">An IPv6 address of type string.</param>
+  /// 
   /// <returns>
-  /// An object that has three properties: success and two nullable 
-  /// string type: error and data.
+  /// Expanded IPv6 address
   /// </returns>
-  internal static IPv6ReturnData Expand(string ipv6Address)
+  /// 
+  /// <exception cref="ArgumentException">
+  /// Throws an exception if the input IPv6 address is not valid.
+  /// </exception>
+  internal static string Expand(string ipv6Address)
   {
     // Sanitize user input first.
     ipv6Address = ipv6Address.Trim().ToLower();
@@ -134,28 +139,16 @@ internal static class IPv6
     List<string> segments = [];
 
     // Return data.
-    IPv6ReturnData expandedIPv6;
+    string expandedIPv6;
 
 
-    try
-    {
-      // Check first if the address is valid.
-      if (!IsValidIPv6(ipv6Address)) throw new ArgumentException("From Expand: Invalid IPv6 provided.");
-    }
-    catch (ArgumentException ex)
-    {
-      expandedIPv6.success = false;
-      expandedIPv6.error = ex.Message;
-      expandedIPv6.data = null;
-      return expandedIPv6;
-    }
+    // First validate input data.
+    if (!IsValidIPv6(ipv6Address)) throw new ArgumentException("From Expand: Invalid IPv6 provided.");
 
     // Check if the user input is just :: 
     if (Regex.IsMatch(ipv6Address, doubleColonPattern))
     {
-      expandedIPv6.success = true;
-      expandedIPv6.data = "0000:0000:0000:0000:0000:0000:0000:0000";
-      expandedIPv6.error = null;
+      expandedIPv6 = "0000:0000:0000:0000:0000:0000:0000:0000";
       return expandedIPv6;
     }
 
@@ -192,10 +185,8 @@ internal static class IPv6
       }
     }
 
-    // Update message.
-    expandedIPv6.success = true;
-    expandedIPv6.error = null;
-    expandedIPv6.data = String.Join(':', segments);    
+    // Update return data.
+    expandedIPv6 = String.Join(':', segments);    
     // Finally
     return expandedIPv6;
   }
