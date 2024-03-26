@@ -518,8 +518,7 @@ internal static class IPv6
 
 
   /// <summary>
-  /// Converts a positive integers that is greater than max value of ulong type
-  /// or 2^64.
+  /// Converts a positive integers that is greater than 2^64 to binary.
   /// </summary>
   /// 
   /// <remarks>
@@ -665,17 +664,148 @@ internal static class IPv6
 
 
   /// <summary>
+  /// Converts positive integers into hexadecimals.
+  /// </summary>
+  /// 
+  /// <param name="integer">Positive integers range from 0 to 255.</param>
+  /// 
+  /// <returns>A string of hexadecimals.</returns>
+  internal static string ToHex(byte integer)
+  {
+    // Return data.
+    string hexadecimals;
+
+
+    // Convert integer to hexadecimals.
+    hexadecimals = Convert.ToString(integer, 16);
+
+    // Finally
+    return hexadecimals;
+  }
+
+
+
+  /// <summary>
+  /// Converts positive integers into hexadecimals.
+  /// </summary>
+  /// 
+  /// <param name="integer">Positive integers range from 0 to 65,535.</param>
+  /// 
+  /// <returns>A string of hexadecimals.</returns>
+  internal static string ToHex(ushort integer)
+  {
+    // Return data.
+    string hexadecimals;
+
+
+    // Convert integer to hexadecimals.
+    hexadecimals = Convert.ToString(integer, 16);
+
+    // Finally
+    return hexadecimals;
+  }
+
+
+  /// <summary>
+  /// Converts positive integers into hexadecimals.
+  /// </summary>
+  /// 
+  /// <param name="integer">Positive integers range from 0 to 4,294,967,295.</param>
+  /// 
+  /// <returns>A string of hexadecimals.</returns>
+  internal static string ToHex(uint integer)
+  {
+    // Return data.
+    string hexadecimals;
+
+
+    // Convert integer to hexadecimals.
+    hexadecimals = Convert.ToString(integer, 16);
+
+    // Finally
+    return hexadecimals;
+  }
+
+
+  /// <summary>
+  /// Converts positive integers into hexadecimals.
+  /// </summary>
+  /// 
+  /// <param name="integer">Positive integers range from 0 to 18,446,744,073,709,551,615.</param>
+  /// 
+  /// <returns>A string of hexadecimals.</returns>
+  internal static string ToHex(ulong integer)
+  {
+    // Return data.
+    string hexadecimals;
+
+
+    /*
+      Covert integer to Hexadecimals.
+      Since Convert.ToString doesn't have a method signature for UInt64,
+      we have to cast it to Int64 (long).
+    */
+    hexadecimals = Convert.ToString((long)integer, 16);
+
+    // Finally
+    return hexadecimals;
+  }    
+
+
+  /// <summary>
+  /// Converts a positive integers that is greater than 2^64 to hexadecimals.
+  /// </summary>
+  /// 
+  /// <remarks>
+  /// Throws an exception if argument is not a positive bigint.
+  /// </remarks>
+  /// 
+  /// <param name="integer">
+  /// A positive bigint integers that is greater than 2^64.
+  /// </param>
+  /// 
+  /// <returns>
+  /// A string of hexadecimals
+  /// </returns>
+  /// 
+  /// <exception cref="ArgumentException">
+  /// Throws an exception if the input bigint is not positive.
+  /// </exception>  
+  internal static string ToHex(BigInteger integer)
+  {
+    // Return data
+    string hexadecimals;
+
+    // Input integer must be positive.
+    if (integer < 0) throw new ArgumentException("From ToHex: bigint Integer must be positive.");
+
+    /*
+      Covert integer to hexadecimals.
+      Since c# doesn't have a built-in method to convert BigInteger to
+      hexadecimals we have to use the ConvertIntegerToBinary method.
+    */
+    string binaries = ConvertIntegerToBinary(integer);
+
+    // Then from binary to hexadecimals.
+    hexadecimals = ConvertBinaryToHex(binaries);
+
+    // Finally.
+    return hexadecimals;
+  }
+
+
+  /// <summary>
   /// Converts binary to hexadecimals.
   /// </summary>
   /// 
   /// <param name="binary">A string of postive binaries.</param>
   /// 
   /// <returns>A string of positive hex digits.</returns>
-  /// 
-
   private static string ConvertBinaryToHex(string binary)
   {
     /*
+      This method is created because c# doesn't have a built-in method
+      for converting integers greater than 2^64.
       Input data validation for this method relies on the method caller
       of this method to avoid slowing down the application by having
       multiple data validation.
