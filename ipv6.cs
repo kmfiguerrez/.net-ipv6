@@ -1006,7 +1006,7 @@ internal static class IPv6
   /// <returns>Typed byte integers.</returns>
   /// 
   /// <exception cref="ArgumentException"></exception>
-  internal static ushort ToUShortDecimal(string binORHex, sbyte fromBase)
+  internal static ushort ToUshortDecimal(string binORHex, sbyte fromBase)
   {
     /*
       Note!
@@ -1018,7 +1018,7 @@ internal static class IPv6
     */
 
     // Argument cannot be null or empty.
-    if (binORHex == null || binORHex == "") throw new ArgumentException("From ToByteDecimal: Did not provide argument.");
+    if (binORHex == null || binORHex == "") throw new ArgumentException("From ToUshortDecimal: Did not provide argument.");
 
     // Return data.
     byte decimals;
@@ -1032,7 +1032,7 @@ internal static class IPv6
         string binaries = binORHex.Trim();
 
         // Validate input data.
-        if (!IsBinary(binaries)) throw new ArgumentException("From ToByteDecimal: Invalid binaries provided.");
+        if (!IsBinary(binaries)) throw new ArgumentException("From ToUshortDecimal: Invalid binaries provided.");
 
         // Convert binaries to decimal form.
         decimals = Convert.ToByte(binaries, 2);
@@ -1044,7 +1044,7 @@ internal static class IPv6
         string hexadecimals = binORHex.Trim();
 
         // Validate input data.
-        if (!IsHex(hexadecimals)) throw new ArgumentException("From ToByteDecimal: Invalid hexadecimals provided.");
+        if (!IsHex(hexadecimals)) throw new ArgumentException("From ToUshortDecimal: Invalid hexadecimals provided.");
 
         // Convert binaries to decimal form.
         decimals = Convert.ToByte(hexadecimals, 16);
@@ -1052,11 +1052,98 @@ internal static class IPv6
         return decimals;
       }           
       default: {
-        throw new ArgumentException("From ToByteDecimal: Invalid base number system provided.");
+        throw new ArgumentException("From ToUshortDecimal: Invalid base number system provided.");
       }
     }
   }  
 
+
+  /// <summary>
+  /// Converts a string of binaries or hexadecimals into decimal form (integer).
+  /// </summary>
+  /// 
+  /// <remarks>
+  /// Notes:
+  ///   <list type="bullet">
+  ///     <item>
+  ///       <description>
+  ///         The <c>binOrHex</c> argument is either a string of binaries or
+  ///         hexadecimals. Meaning it should not be prefixed with <c>0b</c> or <c>0x</c>.
+  ///         The integral value should also be in range based on the 
+  ///         return data type.
+  ///       </description>
+  ///     </item>
+  ///     <item>
+  ///       <description>
+  ///         The <c>fromBase</c> argument accepts only two integer values: 
+  ///         <c>2</c> for binaries and <c>16</c> for hexadecimals. 
+  ///       </description>
+  ///     </item>
+  ///     <item>
+  ///       <description>
+  ///         This method throws an exception if not provided with the 
+  ///         desired arguments.
+  ///       </description>
+  ///     </item>
+  ///   </list>
+  /// </remarks>
+  /// 
+  /// <param name="binORHex">A string of binaries or hexadecimals.</param>
+  /// <param name="fromBase">An integer with only two possible values 2 and 16.</param>
+  /// 
+  /// <returns>Typed byte integers.</returns>
+  /// 
+  /// <exception cref="ArgumentException"></exception>
+  internal static uint ToUintDecimal(string binORHex, sbyte fromBase)
+  {
+    /*
+      Note!
+      The toByte method throws multiple exceptions. In this code
+      it could throw an OverflowException if received values that either
+      too large or too small.
+      Make sure to filter input binOrHex values in the method caller of
+      this method.
+    */
+
+    // Argument cannot be null or empty.
+    if (binORHex == null || binORHex == "") throw new ArgumentException("From ToUintDecimal: Did not provide argument.");
+
+    // Return data.
+    byte decimals;
+
+
+    // Determine what base number system to work on.
+    switch (fromBase)
+    {
+      case 2: {
+        // Sanitize user input first.
+        string binaries = binORHex.Trim();
+
+        // Validate input data.
+        if (!IsBinary(binaries)) throw new ArgumentException("From ToUintDecimal: Invalid binaries provided.");
+
+        // Convert binaries to decimal form.
+        decimals = Convert.ToByte(binaries, 2);
+
+        return decimals;
+      }
+      case 16: {
+        // Sanitize user input first.
+        string hexadecimals = binORHex.Trim();
+
+        // Validate input data.
+        if (!IsHex(hexadecimals)) throw new ArgumentException("From ToUintDecimal: Invalid hexadecimals provided.");
+
+        // Convert binaries to decimal form.
+        decimals = Convert.ToByte(hexadecimals, 16);
+
+        return decimals;
+      }           
+      default: {
+        throw new ArgumentException("From ToUintDecimal: Invalid base number system provided.");
+      }
+    }
+  }  
 
 
 
