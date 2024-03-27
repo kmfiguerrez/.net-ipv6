@@ -587,16 +587,26 @@ internal static class IPv6
   /// integers greater than (2 raised to 64).
   /// </summary>
   /// 
+  /// <remarks>
+  /// If <c>skipArgumentValidation</c> is set to <c>true</c>, 
+  /// this method performs argument validation and throws an exception.
+  /// </remarks>
+  /// 
   /// <param name="integer">A positive integers</param>
   /// 
   /// <returns>A string of binaries.</returns>
-  private static string ConvertIntegerToBinary(BigInteger integer)
+  /// 
+  /// <exception cref="ArgumentException"></exception>   
+  private static string ConvertIntegerToBinary(BigInteger integer, bool skipArgumentValidation = true)
   {
     /*
       Had to create this method because c# doesn't have a built-in 
       methods to convert bigint numbers to binary. 
       The logic used to get the binary in this method is the tradional
       method of converting decimal to binary by subtraction.
+      Input data validation for this method relies on the method caller
+      of this method to avoid slowing down the application by having
+      multiple data validation.      
     */
 
     BigInteger decimalForm = integer;
@@ -609,6 +619,16 @@ internal static class IPv6
     string binary;
     
 
+    /*
+      Validate input data. Disabled by default. 
+      It's up to the method caller.
+    */
+    if (skipArgumentValidation == false)
+    {
+      if (integer < 0) throw new ArgumentException("From ConvertIntegerToBinary: BigInteger must be positive.");
+    }     
+
+    // Get the binaries.
     for (BigInteger i = exponent; !(i <= -1); i--)
     {
       currentPlaceValue = BigInteger.Pow(numbericBase, (int)i);
@@ -823,10 +843,17 @@ internal static class IPv6
   /// Converts binary to hexadecimals.
   /// </summary>
   /// 
+  /// <remarks>
+  /// If <c>skipArgumentValidation</c> is set to <c>true</c>, 
+  /// this method performs argument validation and throws an exception.
+  /// </remarks>
+  /// 
   /// <param name="binary">A string of postive binaries.</param>
   /// 
   /// <returns>A string of positive hex digits.</returns>
-  private static string ConvertBinaryToHex(string binary)
+  /// 
+  /// <exception cref="ArgumentException"></exception>  
+  private static string ConvertBinaryToHex(string binary, bool skipArgumentValidation = true)
   {
     /*
       This method is created because c# doesn't have a built-in method
@@ -844,6 +871,15 @@ internal static class IPv6
     List<string> nibbles = [];
     string hexadecimals;
 
+    
+    /*
+      Validate input data. Disabled by default. 
+      It's up to the method caller.
+    */
+    if (skipArgumentValidation == false)
+    {
+      if (!IsBinary(binary)) throw new ArgumentException("From ConvertBinaryToHex: Invalid binaries provided.");
+    }  
 
     // Check if not divisible by four.
     if (!divisibleByFour)
@@ -1010,7 +1046,7 @@ internal static class IPv6
   {
     /*
       Note!
-      The toByte method throws multiple exceptions. In this code
+      The ToUInt16 method throws multiple exceptions. In this code
       it could throw an OverflowException if received values that either
       too large or too small.
       Make sure to filter input binOrHex values in the method caller of
@@ -1021,7 +1057,7 @@ internal static class IPv6
     if (binORHex == null || binORHex == "") throw new ArgumentException("From ToUshortDecimal: Did not provide argument.");
 
     // Return data.
-    byte decimals;
+    ushort decimals;
 
 
     // Determine what base number system to work on.
@@ -1035,7 +1071,7 @@ internal static class IPv6
         if (!IsBinary(binaries)) throw new ArgumentException("From ToUshortDecimal: Invalid binaries provided.");
 
         // Convert binaries to decimal form.
-        decimals = Convert.ToByte(binaries, 2);
+        decimals = Convert.ToUInt16(binaries, 2);
 
         return decimals;
       }
@@ -1047,7 +1083,7 @@ internal static class IPv6
         if (!IsHex(hexadecimals)) throw new ArgumentException("From ToUshortDecimal: Invalid hexadecimals provided.");
 
         // Convert binaries to decimal form.
-        decimals = Convert.ToByte(hexadecimals, 16);
+        decimals = Convert.ToUInt16(hexadecimals, 16);
 
         return decimals;
       }           
@@ -1098,7 +1134,7 @@ internal static class IPv6
   {
     /*
       Note!
-      The toByte method throws multiple exceptions. In this code
+      The ToUInt32 method throws multiple exceptions. In this code
       it could throw an OverflowException if received values that either
       too large or too small.
       Make sure to filter input binOrHex values in the method caller of
@@ -1109,7 +1145,7 @@ internal static class IPv6
     if (binORHex == null || binORHex == "") throw new ArgumentException("From ToUintDecimal: Did not provide argument.");
 
     // Return data.
-    byte decimals;
+    uint decimals;
 
 
     // Determine what base number system to work on.
@@ -1123,7 +1159,7 @@ internal static class IPv6
         if (!IsBinary(binaries)) throw new ArgumentException("From ToUintDecimal: Invalid binaries provided.");
 
         // Convert binaries to decimal form.
-        decimals = Convert.ToByte(binaries, 2);
+        decimals = Convert.ToUInt32(binaries, 2);
 
         return decimals;
       }
@@ -1135,7 +1171,7 @@ internal static class IPv6
         if (!IsHex(hexadecimals)) throw new ArgumentException("From ToUintDecimal: Invalid hexadecimals provided.");
 
         // Convert binaries to decimal form.
-        decimals = Convert.ToByte(hexadecimals, 16);
+        decimals = Convert.ToUInt32(hexadecimals, 16);
 
         return decimals;
       }           
@@ -1179,14 +1215,14 @@ internal static class IPv6
   /// <param name="binORHex">A string of binaries or hexadecimals.</param>
   /// <param name="fromBase">An integer with only two possible values 2 and 16.</param>
   /// 
-  /// <returns>Typed uint integers.</returns>
+  /// <returns>Typed ulong integers.</returns>
   /// 
   /// <exception cref="ArgumentException"></exception>
   internal static ulong ToUlongDecimal(string binORHex, sbyte fromBase)
   {
     /*
       Note!
-      The toByte method throws multiple exceptions. In this code
+      The ToUInt64 method throws multiple exceptions. In this code
       it could throw an OverflowException if received values that either
       too large or too small.
       Make sure to filter input binOrHex values in the method caller of
@@ -1197,7 +1233,7 @@ internal static class IPv6
     if (binORHex == null || binORHex == "") throw new ArgumentException("From ToUlongDecimal: Did not provide argument.");
 
     // Return data.
-    byte decimals;
+    ulong decimals;
 
 
     // Determine what base number system to work on.
@@ -1211,7 +1247,7 @@ internal static class IPv6
         if (!IsBinary(binaries)) throw new ArgumentException("From ToUlongDecimal: Invalid binaries provided.");
 
         // Convert binaries to decimal form.
-        decimals = Convert.ToByte(binaries, 2);
+        decimals = Convert.ToUInt64(binaries, 2);
 
         return decimals;
       }
@@ -1223,7 +1259,7 @@ internal static class IPv6
         if (!IsHex(hexadecimals)) throw new ArgumentException("From ToUlongDecimal: Invalid hexadecimals provided.");
 
         // Convert binaries to decimal form.
-        decimals = Convert.ToByte(hexadecimals, 16);
+        decimals = Convert.ToUInt64(hexadecimals, 16);
 
         return decimals;
       }           
@@ -1231,7 +1267,176 @@ internal static class IPv6
         throw new ArgumentException("From ToUlongDecimal: Invalid base number system provided.");
       }
     }
-  } 
+  }
+
+
+  /// <summary>
+  /// Converts a string of binaries or hexadecimals into decimal form (integer).
+  /// </summary>
+  /// 
+  /// <remarks>
+  /// Notes:
+  ///   <list type="bullet">
+  ///     <item>
+  ///       <description>
+  ///         The <c>binOrHex</c> argument is either a string of binaries or
+  ///         hexadecimals. Meaning it should not be prefixed with <c>0b</c> or <c>0x</c>.
+  ///         The integral value should also be in range based on the 
+  ///         return data type.
+  ///       </description>
+  ///     </item>
+  ///     <item>
+  ///       <description>
+  ///         The <c>fromBase</c> argument accepts only two integer values: 
+  ///         <c>2</c> for binaries and <c>16</c> for hexadecimals. 
+  ///       </description>
+  ///     </item>
+  ///     <item>
+  ///       <description>
+  ///         This method throws an exception if not provided with the 
+  ///         desired arguments.
+  ///       </description>
+  ///     </item>
+  ///   </list>
+  /// </remarks>
+  /// 
+  /// <param name="binORHex">A string of binaries or hexadecimals.</param>
+  /// <param name="fromBase">An integer with only two possible values 2 and 16.</param>
+  /// 
+  /// <returns>BigInteger.</returns>
+  /// 
+  /// <exception cref="ArgumentException"></exception>
+  internal static BigInteger ToBigIntDecimal(string binORHex, byte fromBase)
+  {
+    // Sanitize user input first.
+    binORHex = binORHex.Trim();
+
+    // Argument cannot be null or empty.
+    if (binORHex == null || binORHex == "") throw new ArgumentException("From ToBigIntDecimal: Did not provide argument.");
+
+    // Return data.
+    BigInteger decimals;
+
+
+    // Determine what base number system to work on.
+    switch (fromBase)
+    {
+      case 2: {
+        string binaries = binORHex;
+
+        // Validate input data.
+        if (!IsBinary(binaries)) throw new ArgumentException("From ToBigIntDecimal: Invalid binaries provided.");
+
+        /*
+          Convert binaries to decimal form.
+          Because c# doesn't have a built-in methods to convert binaries greater 
+          than 2^64 to integers, had to create ConvertBinaryToDecimal method.
+        */
+        decimals = ConvertBinaryToDecimal(binaries);
+
+        return decimals;
+      }
+      case 16: {
+        string hexadecimals = binORHex;
+
+        // Validate input data.
+        if (!IsHex(hexadecimals)) throw new ArgumentException("From ToBigIntDecimal: Invalid hexadecimals provided.");
+
+        /*
+          Convert hexadecimals to decimal form.
+          Because c# doesn't have a built-in methods to convert hexadecimals 
+          greater than 2^64 to integers, had to used toBinary method and then 
+          ConvertBinaryToDecimal method.
+        */
+        string binaries = ToBinary(hexadecimals);
+        decimals = ConvertBinaryToDecimal(binaries);
+
+        return decimals;
+      }           
+      default: {
+        throw new ArgumentException("From ToBigIntDecimal: Invalid base number system provided.");
+      }
+    }
+  }  
+
+
+  /// <summary>
+  /// Converts a string binaries to decimal form (integer).
+  /// </summary>
+  /// 
+  /// <remarks>
+  /// If <c>skipArgumentValidation</c> is set to <c>true</c>, 
+  /// this method performs argument validation and throws an exception.
+  /// </remarks>
+  /// 
+  /// <param name="binary">A string of binaries</param>
+  /// <param name="skipArgumentValidation">Boolean.</param>
+  /// 
+  /// <returns>Positive BigInteger.</returns>
+  /// 
+  /// <exception cref="ArgumentException">
+  /// Throws an exception if param skipArgumentValidation is true
+  /// and if argument binary is invalid.
+  /// </exception>
+  private static BigInteger ConvertBinaryToDecimal(string binary, bool skipArgumentValidation = true)
+  {
+    /*
+      Had to create this method because c# doesn't have a built-in 
+      methods to convert binaries greater than 2^64 to integers. 
+    */
+
+    // Sanitize input data first.
+    binary = binary.Trim();
+
+    // Bits length.
+    ushort bits = (ushort)binary.Length;
+
+    // Return data.
+    BigInteger decimals = 0;
+
+
+    /*
+      Validate input data. Disabled by default. 
+      It's up to the method caller.
+    */
+    if (skipArgumentValidation == false)
+    {
+      if (!IsBinary(binary)) throw new ArgumentException("From ConvertBinaryToDecimal: Invalid binaries provided.");
+    }
+
+    // Get the decimal values.
+    for (ushort i = bits; i > 0; i--)
+    {
+      /*
+        Subract one from exponent to get the correct place value of the
+        current bit position.
+      */
+      ushort exponent = (ushort)(i - 1);
+      BigInteger currentPlaceValue = BigInteger.Pow(2, exponent);
+
+      // Get the current bit from the left.
+      ushort currentIndex = (ushort)(bits - i);
+      char currentBit = binary[currentIndex];
+
+      // If the current bit is 1 or on, add the place value.
+      if (currentBit == '1') 
+      {
+        decimals += currentPlaceValue;
+      }
+    }
+
+    // Finally.
+    return decimals;
+  }
+
+
+
+
+
+
+
+
+
 
 
 
