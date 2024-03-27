@@ -371,13 +371,13 @@ internal static class IPv6
   ///     <item>
   ///       <description>
   ///         This method throws an exception if not provided with the 
-  ///         desired hexadecimals argument.
+  ///         desired <c>hexadecimals</c> argument.
   ///       </description>
   ///     </item>
   ///     <item>
   ///       <description>
   ///         Argument <c><paramref name="includeLeadingZeroes"/></c> when
-  ///         set to true will include leading zeroes of the returned
+  ///         set to <c>true</c> will include leading zeroes of the returned
   ///         binaries.
   ///       </description>
   ///     </item>
@@ -882,6 +882,81 @@ internal static class IPv6
 
 
 
+  /// <summary>
+  /// Converts a string of binaries or hexadecimals into decimal form (integer).
+  /// </summary>
+  /// 
+  /// <remarks>
+  /// Notes:
+  ///   <list type="bullet">
+  ///     <item>
+  ///       <description>
+  ///         The <c>binOrHex</c> argument is either a string of binaries or
+  ///         hexadecimals. Meaning it should not be prefixed with <c>0b</c> or <c>0x</c>.
+  ///       </description>
+  ///     </item>
+  ///     <item>
+  ///       <description>
+  ///         The <c>fromBase</c> argument accepts only two integer values: 
+  ///         <c>2</c> for binaries and <c>16</c> for hexadecimals. 
+  ///       </description>
+  ///     </item>
+  ///     <item>
+  ///       <description>
+  ///         This method throws an exception if not provided with the 
+  ///         desired arguments.
+  ///       </description>
+  ///     </item>
+  ///   </list>
+  /// </remarks>
+  /// 
+  /// <param name="binORHex">A string of binaries or hexadecimals.</param>
+  /// <param name="fromBase">An integer with only two possible values 2 and 16.</param>
+  /// 
+  /// <returns>Typed byte integers.</returns>
+  /// 
+  /// <exception cref="ArgumentException"></exception>
+  internal static byte ToByteDecimal(string binORHex, sbyte fromBase)
+  {
+    // Argument cannot be null or empty.
+    if (binORHex == null || binORHex == "") throw new ArgumentException("From ToByteDecimal: Did not provide argument.");
+
+    // Return data.
+    byte decimals;
+
+
+    // Determine what base number system to work on.
+    switch (fromBase)
+    {
+      case 2: {
+        // Sanitize user input first.
+        string binaries = binORHex.Trim();
+
+        // Validate input data.
+        if (IsBinary(binaries)) throw new ArgumentException("From ToByteDecimal: Invalid binaries provided.");
+
+        // Convert binaries to decimal form.
+        decimals = Convert.ToByte(binaries, 2);
+
+        return decimals;
+      }
+      case 16: {
+        // Sanitize user input first.
+        string hexadecimals = binORHex.Trim();
+
+        // Validate input data.
+        if (IsHex(hexadecimals)) throw new ArgumentException("From ToByteDecimal: Invalid hexadecimals provided.");
+
+        // Convert binaries to decimal form.
+        decimals = Convert.ToByte(hexadecimals, 16);
+
+        return decimals;
+      }           
+      default: {
+        throw new ArgumentException("From ToByteDecimal: Invalid base number system provided.");
+      }
+    }
+  }
 
 
 
